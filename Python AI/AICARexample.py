@@ -11,6 +11,7 @@ SCREEN_HEIGHT = 1016
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 TRACK = pygame.image.load(os.path.join("track.png"))
 
+
 class Car(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
