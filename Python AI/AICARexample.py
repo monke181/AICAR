@@ -1,8 +1,8 @@
 import pygame
-import os
 import math
 import sys
 import neat
+import os
 
 pygame.init()
 
@@ -24,6 +24,7 @@ class Car(pygame.sprite.Sprite):
         self.direction = 0
         self.alive = True
         self.radars = []
+        self.checkpoint = 0
  
     def update(self):
         self.radars.clear()
@@ -48,7 +49,11 @@ class Car(pygame.sprite.Sprite):
         if SCREEN.get_at(collision_point_right) == pygame.Color(2, 105, 31, 255) \
                 or SCREEN.get_at(collision_point_left) == pygame.Color(2, 105, 31, 255):
             self.alive = False
-     
+        #check if hit checkpoint
+        if SCREEN.get_at(collision_point_right) == pygame.Color(2, 00, 00, 00) \
+                or SCREEN.get_at(collision_point_left) == pygame.Color(2, 00, 00, 00):
+            self.checkpoint += 1
+            print("Checkpoint num:", self.checkpoint)
 
         # draw collision points
         pygame.draw.circle(SCREEN, (0, 255, 255, 0), collision_point_right, 4)
