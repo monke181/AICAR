@@ -12,6 +12,17 @@ SCREEN_HEIGHT = 1016
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 TRACK = pygame.image.load(os.path.join("track.png"))
 CHECKPOINTTRACK = pygame.image.load(os.path.join("track_with_checkpoints.png"))
+#caption for top of screen
+pygame.display.set_caption('AICAR')
+#score
+font = pygame.font.SysFont('Bauhaus 93', 60)
+#color
+white = (255, 255, 255)
+#drawing text
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    SCREEN.blit(img, (x, y))
+
 class Car(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -24,6 +35,7 @@ class Car(pygame.sprite.Sprite):
         self.direction = 0
         self.alive = True
         self.radars = []
+        
         
  
     def update(self):
@@ -39,6 +51,7 @@ class Car(pygame.sprite.Sprite):
         self.rect.center += self.vel_vector * 6
 
     def collision(self):
+        global score
         length = 40
         collision_point_right = [int(self.rect.center[0] + math.cos(math.radians(self.angle + 18)) * length),
                                  int(self.rect.center[1] - math.sin(math.radians(self.angle + 18)) * length)]
@@ -52,7 +65,9 @@ class Car(pygame.sprite.Sprite):
         #check if hit checkpoint
         if CHECKPOINTTRACK.get_at(collision_point_right) == pygame.Color(0, 0, 0, 255) \
                 or CHECKPOINTTRACK.get_at(collision_point_left) == pygame.Color(0, 0, 0, 255):
-            print("hit Checkpoint")
+            #print("hit Checkpoint")
+            score += 1
+        
 
         # draw collision points
         pygame.draw.circle(SCREEN, (0, 255, 255, 0), collision_point_right, 4)
@@ -93,11 +108,12 @@ class Car(pygame.sprite.Sprite):
         return input_data
 
 def eval_genomes(genomes, config):
-    global cars, ge, nets
+    global cars, ge, nets, score
 
     cars = []
     ge = []
     nets = []
+    score = 0
     for genome_id, genome in genomes:
         cars.append(pygame.sprite.GroupSingle(Car()))
         ge.append(genome)
@@ -113,7 +129,7 @@ def eval_genomes(genomes, config):
                 sys.exit()
 
         SCREEN.blit(TRACK, (0, 0))
-        
+        draw_text(str(score), font, white, int(SCREEN_WIDTH /2), 20)
         if len(cars) == 0:
             break
 
