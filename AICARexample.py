@@ -3,7 +3,8 @@ import math
 import sys
 import neat
 import os
-
+import torch
+import torch.nn as nn
 pygame.init()
 
 SCREEN_WIDTH = 1244
