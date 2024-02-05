@@ -10,8 +10,7 @@ SCREEN_WIDTH = 1244
 SCREEN_HEIGHT = 1016
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 TRACK = pygame.image.load(os.path.join("track.png"))
-
-
+CHECKPOINTTRACK = pygame.image.load(os.path.join("track_with_checkpoints.png"))
 class Car(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -24,7 +23,7 @@ class Car(pygame.sprite.Sprite):
         self.direction = 0
         self.alive = True
         self.radars = []
-        self.checkpoint = 0
+        
  
     def update(self):
         self.radars.clear()
@@ -50,10 +49,9 @@ class Car(pygame.sprite.Sprite):
                 or SCREEN.get_at(collision_point_left) == pygame.Color(2, 105, 31, 255):
             self.alive = False
         #check if hit checkpoint
-        if SCREEN.get_at(collision_point_right) == pygame.Color(2, 00, 00, 00) \
-                or SCREEN.get_at(collision_point_left) == pygame.Color(2, 00, 00, 00):
-            self.checkpoint += 1
-            print("Checkpoint num:", self.checkpoint)
+        if CHECKPOINTTRACK.get_at(collision_point_right) == pygame.Color(0, 0, 0, 255) \
+                or CHECKPOINTTRACK.get_at(collision_point_left) == pygame.Color(0, 0, 0, 255):
+            print("hit Checkpoint")
 
         # draw collision points
         pygame.draw.circle(SCREEN, (0, 255, 255, 0), collision_point_right, 4)
@@ -114,6 +112,7 @@ def eval_genomes(genomes, config):
                 sys.exit()
 
         SCREEN.blit(TRACK, (0, 0))
+        
         if len(cars) == 0:
             break
 
