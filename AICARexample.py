@@ -49,6 +49,9 @@ class Car(pygame.sprite.Sprite):
 
     def drive(self):
         self.rect.center += self.vel_vector * 6
+    def brake(self):
+        while(self.vel_vector <= 0):
+            self.rect.center += self.vel_vector - 0.1 
 
     def collision(self):
         global score
