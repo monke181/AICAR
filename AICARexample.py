@@ -4,7 +4,7 @@ import sys
 import neat
 import os
 import torch
-# import torch.nn as nn
+import torch.nn as nn
 pygame.init()
 
 SCREEN_WIDTH = 1244
@@ -23,7 +23,6 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     SCREEN.blit(img, (x, y))
 
-    
 class Car(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -50,11 +49,6 @@ class Car(pygame.sprite.Sprite):
 
     def drive(self):
         self.rect.center += self.vel_vector * 6
-        while self.vel_vector[0] <= 1.5 and self.vel_vector[0] >= 0.1:
-            if self.direction == 0:
-                self.vel_vector[0] += 0.1
-            elif self.direction == 2:
-                self.vel_vector[0] -= 0.1
 
     def collision(self):
         global score
@@ -147,15 +141,12 @@ def eval_genomes(genomes, config):
 
         for i, car in enumerate(cars):
             output = nets[i].activate(car.sprite.data())
+            if output[0] > 0.7:
+                car.sprite.direction = 1
+            if output[1] > 0.7:
+                car.sprite.direction = -1
             if output[0] <= 0.7 and output[1] <= 0.7:
                 car.sprite.direction = 0
-            elif output[0] <= 0.8 and output[1] <= 0.8:
-                car.sprite.direction = 2
-            elif output[0] > 0.75:
-                car.sprite.direction = 1
-            elif output[1] > 0.7:
-                car.sprite.direction = -1
-            
 
         # Update
         for car in cars:
