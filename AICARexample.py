@@ -3,8 +3,7 @@ import math
 import sys
 import neat
 import os
-import torch
-import torch.nn as nn
+
 pygame.init()
 
 SCREEN_WIDTH = 1244
@@ -35,7 +34,8 @@ class Car(pygame.sprite.Sprite):
         self.direction = 0
         self.alive = True
         self.radars = []
-        
+        self.checkpoints = 0
+        self.decision_list = []
         
  
     def update(self):
@@ -49,8 +49,11 @@ class Car(pygame.sprite.Sprite):
 
     def drive(self):
         self.rect.center += self.vel_vector * 6
+        if self.direction == 2:
+            self.brake()
+
     def brake(self):
-        while(self.vel_vector <= 0):
+        while(self.vel_vector[0] <= 0):
             self.rect.center += self.vel_vector - 0.1 
 
     def collision(self):
@@ -70,6 +73,7 @@ class Car(pygame.sprite.Sprite):
                 or CHECKPOINTTRACK.get_at(collision_point_left) == pygame.Color(0, 0, 0, 255):
             #print("hit Checkpoint")
             score += 1
+            self.checkpoints += 1
         
 
         # draw collision points
@@ -100,7 +104,7 @@ class Car(pygame.sprite.Sprite):
         pygame.draw.line(SCREEN, (255, 255, 255, 255), self.rect.center, (x, y), 1)
         pygame.draw.circle(SCREEN, (0, 255, 0, 0), (x, y), 3)
 
-        dist = int(math.sqrt(math.pow(self.rect.center[0] - x, 2)
+        dist = float(math.sqrt(math.pow(self.rect.center[0] - x, 2)
                              + math.pow(self.rect.center[1] - y, 2)))
         self.radars.append([radar_angle, dist])
 
@@ -109,6 +113,8 @@ class Car(pygame.sprite.Sprite):
         for i, radar in enumerate(self.radars):
             input_data[i] = int(radar[1])
         return input_data
+    
+    
 
 def eval_genomes(genomes, config):
     global cars, ge, nets, score
@@ -141,20 +147,41 @@ def eval_genomes(genomes, config):
 
         for i, car in enumerate(cars):
             ge[i].fitness += 1
-
+        # Direction 0 = forward
+        # Direction 2 = slow down
+        # Direction 1 = right
+        # Direction -1 = left
         for i, car in enumerate(cars):
-            output = nets[i].activate(car.sprite.data())
-            if output[0] > 0.7:
-                car.sprite.direction = 1
-            if output[1] > 0.7:
-                car.sprite.direction = -1
-            if output[0] <= 0.7 and output[1] <= 0.7:
+            output = car.sprite.data()
+            # output = []
+            # for radar in car.sprite.radars:
+            #     output.append[radar[1]]
+            print(output)
+
+            if output[0] <= 150 and output[4] <= 150:
                 car.sprite.direction = 0
+            elif output[2] < 190:
+                car.sprite.direction = 2
+            # elif output[0] < 150 and output[1] < 150:
+            #     car.sprite.direction = 1
+            #     if car.sprite.vel_vector[0] > 1:
+            #         car.sprite.direction = 2
+            # elif output[3] < 150 and output[4] < 150:
+            #     car.sprite.direction = -1
+            #     if car.sprite.vel_vector[0] > 1:
+            #         car.sprite.direction = 2
+            
+            # turn away from the direction closest to a collision
+            # min distance between all the sprite data aside from the middle one
+            
 
         # Update
         for car in cars:
             car.draw(SCREEN)
             car.update()
+            # Copy moves of car that got the furthest, pass those moves onto each new car
+            # if len(cars) == 1:
+
 
         pygame.display.update()
 
