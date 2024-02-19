@@ -4,6 +4,7 @@ import sys
 import neat
 import os
 
+
 pygame.init()
 
 SCREEN_WIDTH = 1244
@@ -52,9 +53,18 @@ class Car(pygame.sprite.Sprite):
         if self.direction == 2:
             self.brake()
 
+
+
     def brake(self):
-        while(self.vel_vector[0] <= 0):
-            self.rect.center += self.vel_vector - 0.1 
+        if self.direction == 2:
+            self.vel_vector -= pygame.math.Vector2(0.1, 0)
+        else:
+            if self.direction == 1:
+                self.rect.center += self.vel_vector * 6
+        
+
+
+
 
     def collision(self):
         global score
@@ -158,18 +168,18 @@ def eval_genomes(genomes, config):
             #     output.append[radar[1]]
             print(output)
 
-            if output[0] <= 150 and output[4] <= 150:
+            if output[0] <= 80 and output[4] <= 150:
                 car.sprite.direction = 0
-            elif output[2] < 190:
+            elif output[2] < 150:
                 car.sprite.direction = 2
-            # elif output[0] < 150 and output[1] < 150:
-            #     car.sprite.direction = 1
-            #     if car.sprite.vel_vector[0] > 1:
-            #         car.sprite.direction = 2
-            # elif output[3] < 150 and output[4] < 150:
-            #     car.sprite.direction = -1
-            #     if car.sprite.vel_vector[0] > 1:
-            #         car.sprite.direction = 2
+            elif output[0] < 150 and output[1] < 150:
+                car.sprite.direction = -1
+                if car.sprite.vel_vector[0] > 1:
+                     car.sprite.direction = 2
+            elif output[3] < 150 and output[4] < 150:
+                car.sprite.direction = 1
+                if car.sprite.vel_vector[0] > 1:
+                    car.sprite.direction = 2
             
             # turn away from the direction closest to a collision
             # min distance between all the sprite data aside from the middle one
@@ -184,6 +194,7 @@ def eval_genomes(genomes, config):
 
 
         pygame.display.update()
+        
 
 def run(config_path):
     global pop
