@@ -56,11 +56,13 @@ class Car(pygame.sprite.Sprite):
 
 
     def brake(self):
-        if self.direction == 2:
-            self.vel_vector -= pygame.math.Vector2(0.1, 0)
-        else:
-            if self.direction == 1:
-                self.rect.center += self.vel_vector * 6
+        # if self.direction == 2:
+        #     self.vel_vector -= pygame.math.Vector2(0.1, 0)
+        # else:
+        #     if self.direction == 1:
+        #         self.rect.center += self.vel_vector * 6
+        if (self.vel_vector[0] - 0.1) > 0:
+            self.vel_vector[0] -= 0.1
         
 
 
@@ -168,18 +170,19 @@ def eval_genomes(genomes, config):
             #     output.append[radar[1]]
             print(output)
 
-            if output[0] <= 80 and output[4] <= 150:
-                car.sprite.direction = 0
-            elif output[2] < 150:
-                car.sprite.direction = 2
-            elif output[0] < 150 and output[1] < 150:
+            if output[0] < 150 and output[1] < 150:
                 car.sprite.direction = -1
-                if car.sprite.vel_vector[0] > 1:
+                if car.sprite.vel_vector[0] > 1.5:
                      car.sprite.direction = 2
             elif output[3] < 150 and output[4] < 150:
                 car.sprite.direction = 1
-                if car.sprite.vel_vector[0] > 1:
+                if car.sprite.vel_vector[0] > 1.5:
                     car.sprite.direction = 2
+            elif output[0] <= 80 and output[4] <= 150:
+                car.sprite.direction = 0
+            elif output[2] < 140:
+                car.sprite.direction = 2
+            
             
             # turn away from the direction closest to a collision
             # min distance between all the sprite data aside from the middle one
